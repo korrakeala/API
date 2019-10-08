@@ -5,13 +5,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import ar.com.ada.api.billeteravirtual.entities.*;
 import ar.com.ada.api.billeteravirtual.excepciones.PersonaEdadException;
 import ar.com.ada.api.billeteravirtual.models.request.RegistrationRequest;
 import ar.com.ada.api.billeteravirtual.models.response.RegistrationResponse;
-import ar.com.ada.api.billeteravirtual.security.Crypto;
-import ar.com.ada.api.billeteravirtual.services.BilleteraService;
-import ar.com.ada.api.billeteravirtual.services.PersonaService;
 import ar.com.ada.api.billeteravirtual.services.UsuarioService;
 
 /**
@@ -28,7 +24,7 @@ public class AuthController {
         RegistrationResponse r = new RegistrationResponse();
         //aca creamos la persona y el usuario a traves del service.
 
-        int usuarioCreadoId = usuarioService.alta(req.fullName, req.dni, req.email, req.edad, req.password, req.moneda);
+        int usuarioCreadoId = usuarioService.alta(req.fullName, req.dni, req.email, req.edad, req.password, req.moneda, req.userEmail);
 
         r.isOk = true;
         r.message = "Te registraste con exitoooo";

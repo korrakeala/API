@@ -23,7 +23,10 @@ public class UsuarioService {
     @Autowired
     BilleteraService bs;
 
-    public int alta(String fullName, String dni, String email, int edad, String password, String moneda)
+    @Autowired
+    PersonaService ps;
+
+    public int alta(String fullName, String dni, String email, int edad, String password, String moneda, String userEmail)
             throws PersonaEdadException {
         Persona p = new Persona();
         p.setNombre(fullName);
@@ -33,6 +36,7 @@ public class UsuarioService {
         
         Usuario u = new Usuario();
         u.setUserName(p.getEmail());
+        u.setUserEmail(p.getEmail());
 
         String passwordEnTextoClaro;
         String passwordEncriptada;
@@ -40,11 +44,10 @@ public class UsuarioService {
 
         passwordEnTextoClaro = password;
         passwordEncriptada = Crypto.encrypt(passwordEnTextoClaro, u.getUserName());
-        passwordEnTextoClaroDesencriptado = Crypto.decrypt(passwordEncriptada, u.getUserName());
 
         u.setPassword(passwordEncriptada);
         p.setUsuario(u);
-        repo.save(u);
+        ps.save(p);
 
         Billetera b = new Billetera(p);
         Cuenta c = new Cuenta(b, moneda);
@@ -72,7 +75,7 @@ public class UsuarioService {
 
     public Usuario buscarPorEmail(String email) {
 
-        return repo.findByEmail(email);
+        return repo.findByUserEmail(email);
     }
 
     public Usuario buscarPorId(int id) {
