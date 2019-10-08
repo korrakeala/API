@@ -62,16 +62,6 @@ public class Billetera {
         p.setBilletera(this);
     }
 
-    public double consultarSaldo(Billetera b, String moneda) {
-        double s = 0;
-        for (Cuenta c : b.getCuentas()) {
-            if (c.getMoneda().equals(moneda)){
-                s = c.getSaldo();
-            }
-        }
-        return s;
-    }
-
     public double consultarSaldoDisponible(Billetera b, String moneda) {
         double s = 0;
         for (Cuenta c : b.getCuentas()) {
