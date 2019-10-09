@@ -19,6 +19,9 @@ public class BilleteraService {
     @Autowired
     BilleteraRepository repo;
 
+    @Autowired
+    MovimientoService ms;
+
     public void save(Billetera b){
         repo.save(b);
     }
@@ -49,7 +52,16 @@ public class BilleteraService {
         return s;
     }
 
-    
+    public int transferir(int billeteraIdOrig, int billeteraIdDest, double importe) {
+        Billetera b1 = this.buscarPorId(billeteraIdOrig);
+        Billetera b2 = this.buscarPorId(billeteraIdDest);
+        int mov = b1.movimientoTransferir(-importe, b1.getCuenta(0), b2.getCuenta(0));
+        b2.movimientoTransferir(importe, b2.getCuenta(0), b1.getCuenta(0));
+        repo.save(b1);
+        repo.save(b2);
+        return mov;
+    }
+
     /* cómo devuelvo una lista de cuentas y saldos?
     public Cuenta getSaldos(int billeteraId){
         Billetera b = this.buscarPorId(billeteraId);

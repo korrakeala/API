@@ -24,6 +24,10 @@ public class MovimientoService {
     @Autowired
     CuentaService cs;
 
+    public void save(Movimiento m){
+        repo.save(m);
+    }
+
     /**
      * Método para crear movimientos que viene desde fuera de la API, como cuenta
      * bancaria o tarjeta de crédito.
@@ -36,7 +40,7 @@ public class MovimientoService {
      * @param tipo     "Entrada" o "Salida"
      * @throws CuentaPorMonedaException
      */
-    public int Movimiento(int billeteraId, String moneda, String concepto, double importe, String tipo)
+    public int depositar(int billeteraId, String moneda, String concepto, double importe, String tipo)
             throws CuentaPorMonedaException {
         Billetera b = bs.buscarPorId(billeteraId);
         Cuenta c = cs.getCuentaPorMoneda(billeteraId, moneda);
@@ -58,6 +62,7 @@ public class MovimientoService {
             c.setSaldoDisponible(c.getSaldo());
         }
         m.setCuenta(c);
+        repo.save(m);
         bs.save(b);
         //RequestResponse no devuelve los ids, qué caranchos pasa?
         return m.getMovimientoId();

@@ -73,10 +73,7 @@ public class Billetera {
     }   
 
     
-    public void transferencia(Billetera bDestino, double importe) {
-        movimientoTransferencia(-importe, this.getCuenta(0), bDestino.getCuenta(0));
-        bDestino.movimientoTransferencia(importe, bDestino.getCuenta(0), this.getCuenta(0));
-    }
+    
 
     /**
      * Hace una transferencia entre cuentas principales.
@@ -85,7 +82,7 @@ public class Billetera {
      * @param bOrigen
      * @param bDestino
      */
-    public void movimientoTransferencia(double importe, Cuenta cuentaDesde, Cuenta cuentaHasta) {
+    public int movimientoTransferir(double importe, Cuenta cuentaDesde, Cuenta cuentaHasta) {
         Movimiento m = new Movimiento();
         m.setImporte(importe);
         m.setCuenta(this.getCuenta(0));
@@ -99,6 +96,7 @@ public class Billetera {
         m.setaUsuarioId(cuentaHasta.getUsuario().getUsuarioId());
         cuentaDesde.setSaldo(cuentaDesde.getSaldo() + importe);
         cuentaDesde.setSaldoDisponible(cuentaDesde.getSaldoDisponible() + importe);
+        return m.getMovimientoId();
     }
     
 }
