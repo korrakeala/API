@@ -5,7 +5,6 @@ package ar.com.ada.api.billeteravirtual.models.request;
  */
 public class MovimientoRequest {
 
-    public int billeteraId;
     public String moneda;
     public String concepto;
     public double importe;

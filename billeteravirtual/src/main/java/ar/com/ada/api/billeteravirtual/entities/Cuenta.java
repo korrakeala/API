@@ -112,6 +112,7 @@ public class Cuenta {
 
         //this.saldo = 100;
         this.moneda = moneda;
+        this.billetera = b;
         b.getCuentas().add(this);
 
     }

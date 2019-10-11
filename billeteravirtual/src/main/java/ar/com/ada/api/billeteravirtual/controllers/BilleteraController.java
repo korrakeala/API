@@ -26,31 +26,31 @@ public class BilleteraController {
     @Autowired
     CuentaService cs;
 
-    @PostMapping("billeteras/depositos")
-    public MovimientoResponse postAgregarPlata(@RequestBody MovimientoRequest req) throws CuentaPorMonedaException {
+    @PostMapping("billeteras/{id}/depositos")
+    public MovimientoResponse postAgregarPlata(@PathVariable int id, @RequestBody MovimientoRequest req) throws CuentaPorMonedaException {
         MovimientoResponse r = new MovimientoResponse();
 
-        int movimientoId = ms.depositarExtraer(req.billeteraId, req.moneda, req.concepto, req.importe, "Entrada");
+        int movimientoId = ms.depositarExtraer(id, req.moneda, req.concepto, req.importe, "Entrada");
 
         r.isOk = true;
         r.message = "Transacción exitosa.";
-        r.billeteraId = req.billeteraId;
+        r.billeteraId = id;
         r.moneda = req.moneda;
         r.movimientoId = movimientoId;
         return r;
 
     }
 
-    @PostMapping("billeteras/extracciones")
-    public MovimientoResponse postExtraerPlata(@RequestBody MovimientoRequest req) throws CuentaPorMonedaException {
+    @PostMapping("billeteras/{id}/extracciones")
+    public MovimientoResponse postExtraerPlata(@PathVariable int id, @RequestBody MovimientoRequest req) throws CuentaPorMonedaException {
         MovimientoResponse r = new MovimientoResponse();
         // req.importe en negativo para respetar lógica de entradas positivas y salidas
         // negativas
-        int movimientoId = ms.depositarExtraer(req.billeteraId, req.moneda, req.concepto, -req.importe, "Salida");
+        int movimientoId = ms.depositarExtraer(id, req.moneda, req.concepto, -req.importe, "Salida");
 
         r.isOk = true;
         r.message = "Transacción exitosa.";
-        r.billeteraId = req.billeteraId;
+        r.billeteraId = id;
         r.moneda = req.moneda;
         r.movimientoId = movimientoId;
         return r;
@@ -98,5 +98,23 @@ public class BilleteraController {
         r.concepto = req.concepto;
         r.operacionId = operacionId;
         return r; // cómo devolver los ids de movimientos? conviene?
+    }
+
+    @PostMapping("billeteras/{id}/cuentas/{moneda}")
+    public CrearCuentaResponse postCuenta(@PathVariable int id, @PathVariable String moneda)
+            throws CuentaPorMonedaException {
+        CrearCuentaResponse r = new CrearCuentaResponse();
+
+        Billetera b = bs.buscarPorId(id);
+        Cuenta c = new Cuenta(b, moneda);
+        bs.save(b);
+        ms.depositarExtraer(id, moneda, "Carga inicial", 50, "Entrada");
+        bs.save(b);
+
+        r.billeteraId = id;
+        r.message = "Cuenta en "+ moneda + " generada con éxito.";
+        r.isOk = true;
+        return r;
+
     }
 }
