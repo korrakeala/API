@@ -71,32 +71,5 @@ public class Billetera {
         }
         return s;
     }   
-
-    
-    
-
-    /**
-     * Hace una transferencia entre cuentas principales.
-     * 
-     * @param importe
-     * @param bOrigen
-     * @param bDestino
-     */
-    public int movimientoTransferir(double importe, Cuenta cuentaDesde, Cuenta cuentaHasta) {
-        Movimiento m = new Movimiento();
-        m.setImporte(importe);
-        m.setCuenta(this.getCuenta(0));
-        Date f = new Date();
-        m.setConcepto(" ");
-        m.setTipo("Transferencia");
-        m.setFechaMov(f);
-        m.setCuentaOrigenId(cuentaDesde.getCuentaId());
-        m.setCuentaDestinoId(cuentaHasta.getCuentaId());
-        m.setDeUsuarioId(cuentaDesde.getUsuario().getUsuarioId());
-        m.setaUsuarioId(cuentaHasta.getUsuario().getUsuarioId());
-        cuentaDesde.setSaldo(cuentaDesde.getSaldo() + importe);
-        cuentaDesde.setSaldoDisponible(cuentaDesde.getSaldoDisponible() + importe);
-        return m.getMovimientoId();
-    }
     
 }

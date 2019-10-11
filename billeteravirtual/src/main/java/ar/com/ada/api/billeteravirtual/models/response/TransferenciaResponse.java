@@ -10,5 +10,6 @@ public class TransferenciaResponse {
     public int billeteraIdOrig;
     public int billeteraIdDest;
     public double importe;
+    public String concepto;
     public int operacionId;
 }

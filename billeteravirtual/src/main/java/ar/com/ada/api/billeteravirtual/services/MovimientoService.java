@@ -24,7 +24,7 @@ public class MovimientoService {
     @Autowired
     CuentaService cs;
 
-    public void save(Movimiento m){
+    public void save(Movimiento m) {
         repo.save(m);
     }
 
@@ -40,7 +40,7 @@ public class MovimientoService {
      * @param tipo     "Entrada" o "Salida"
      * @throws CuentaPorMonedaException
      */
-    public int depositar(int billeteraId, String moneda, String concepto, double importe, String tipo)
+    public int depositarExtraer(int billeteraId, String moneda, String concepto, double importe, String tipo)
             throws CuentaPorMonedaException {
         Billetera b = bs.buscarPorId(billeteraId);
         Cuenta c = cs.getCuentaPorMoneda(billeteraId, moneda);
@@ -54,17 +54,52 @@ public class MovimientoService {
         m.setCuentaDestinoId(c.getCuentaId());
         m.setaUsuarioId(c.getBilletera().getPersona().getUsuario().getUsuarioId());
         m.setDeUsuarioId(c.getBilletera().getPersona().getUsuario().getUsuarioId());
-        if (m.getTipo().equals("Entrada")) {
-            c.setSaldo(c.getSaldo() + m.getImporte());
-            c.setSaldoDisponible(c.getSaldo());
-        } else {
-            c.setSaldo(c.getSaldo() - m.getImporte());
-            c.setSaldoDisponible(c.getSaldo());
-        }
+        // if (m.getTipo().equals("Entrada")) {
+        c.setSaldo(c.getSaldo() + m.getImporte());
+        c.setSaldoDisponible(c.getSaldo());
+        // } else {
+        // if (m.getTipo().equals("Salida")){
+        // c.setSaldo(c.getSaldo() - m.getImporte());
+        // c.setSaldoDisponible(c.getSaldo());
+        // }
+        // }
         m.setCuenta(c);
-        repo.save(m);
+        repo.save(m); // Debería devolver movimientoId simplemente con bs.save(b);, pero no sucede.
+                      // Agregando esta línea, funciona.
         bs.save(b);
-        //RequestResponse no devuelve los ids, qué caranchos pasa?
         return m.getMovimientoId();
+    }
+
+    /**
+     * Hace una transferencia entre cuentas principales (de índice 0)
+     * 
+     * @param importe
+     * @param bOrigen
+     * @param bDestino
+     * @throws CuentaPorMonedaException
+     */
+    public int movimientoTransferir(Billetera b, double importe, Cuenta cuentaDesde, Cuenta cuentaHasta,
+            String concepto) throws CuentaPorMonedaException {
+        if (cuentaDesde.getMoneda().equals(cuentaHasta.getMoneda())) {
+            Movimiento m = new Movimiento();
+            m.setImporte(importe);
+            m.setCuenta(b.getCuenta(0));
+            Date f = new Date();
+            m.setConcepto(concepto);
+            m.setTipo("Transferencia");
+            m.setFechaMov(f);
+            m.setCuentaOrigenId(cuentaDesde.getCuentaId());
+            m.setCuentaDestinoId(cuentaHasta.getCuentaId());
+            m.setDeUsuarioId(cuentaDesde.getUsuario().getUsuarioId());
+            m.setaUsuarioId(cuentaHasta.getUsuario().getUsuarioId());
+            cuentaDesde.setSaldo(cuentaDesde.getSaldo() + importe);
+            cuentaDesde.setSaldoDisponible(cuentaDesde.getSaldoDisponible() + importe);
+            repo.save(m);
+            bs.save(b);
+            return m.getMovimientoId();
+        } else {
+            throw new CuentaPorMonedaException("Las cuentas deben ser en la misma moneda.");
+        }
+
     }
 }

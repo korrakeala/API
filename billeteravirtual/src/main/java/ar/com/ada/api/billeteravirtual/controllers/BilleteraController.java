@@ -1,12 +1,16 @@
 package ar.com.ada.api.billeteravirtual.controllers;
 
+import java.util.*;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import ar.com.ada.api.billeteravirtual.entities.*;
 import ar.com.ada.api.billeteravirtual.excepciones.*;
 import ar.com.ada.api.billeteravirtual.models.request.*;
 import ar.com.ada.api.billeteravirtual.models.response.*;
 import ar.com.ada.api.billeteravirtual.services.*;
+
 /**
  * BilleteraController
  */
@@ -25,38 +29,74 @@ public class BilleteraController {
     @PostMapping("billeteras/depositos")
     public MovimientoResponse postAgregarPlata(@RequestBody MovimientoRequest req) throws CuentaPorMonedaException {
         MovimientoResponse r = new MovimientoResponse();
-        
-        int movimientoId = ms.depositar(req.billeteraId, req.moneda, req.concepto, req.importe, req.tipo);
+
+        int movimientoId = ms.depositarExtraer(req.billeteraId, req.moneda, req.concepto, req.importe, "Entrada");
 
         r.isOk = true;
         r.message = "Transacción exitosa.";
         r.billeteraId = req.billeteraId;
         r.moneda = req.moneda;
-        //cómo hago para que me devuelva movimiendoId?
         r.movimientoId = movimientoId;
         return r;
 
     }
 
-    @GetMapping("billeteras/saldos/{id}")
-    public double getConsultarSaldo(@PathVariable int billeteraId, String moneda){
-
-        double saldo = bs.consultarSaldo(billeteraId, moneda);
-
-        return saldo;
-    }
-
-    @PostMapping("billeteras/transferencias")
-    public TransferenciaResponse postTransferencia(@RequestBody TransferenciaRequest req){
-        TransferenciaResponse r = new TransferenciaResponse();
-
-        int operacionId = bs.transferir(req.billeteraIdOrig, req.billeteraIdDest, req.importe);
+    @PostMapping("billeteras/extracciones")
+    public MovimientoResponse postExtraerPlata(@RequestBody MovimientoRequest req) throws CuentaPorMonedaException {
+        MovimientoResponse r = new MovimientoResponse();
+        // req.importe en negativo para respetar lógica de entradas positivas y salidas
+        // negativas
+        int movimientoId = ms.depositarExtraer(req.billeteraId, req.moneda, req.concepto, -req.importe, "Salida");
 
         r.isOk = true;
-        r.billeteraIdOrig = req.billeteraIdOrig;
-        r.billeteraIdDest = req.billeteraIdDest;
+        r.message = "Transacción exitosa.";
+        r.billeteraId = req.billeteraId;
+        r.moneda = req.moneda;
+        r.movimientoId = movimientoId;
+        return r;
+
+    }
+
+    @GetMapping("/billeteras/{id}/saldos")
+    public ArrayList<SaldoResponse> getSaldos(@PathVariable int id) {
+        Billetera b = bs.buscarPorId(id);
+        ArrayList<SaldoResponse> ls = new ArrayList<>();
+        for (Cuenta c : b.getCuentas()) {
+            SaldoResponse r = new SaldoResponse();
+            r.billeteraId = id;
+            r.moneda = c.getMoneda();
+            r.saldo = c.getSaldo();
+            ls.add(r);
+        }
+        return ls;
+    }
+
+    @GetMapping("billeteras/{id}/saldos/{moneda}")
+    public SaldoResponse getConsultarSaldo(@PathVariable int id, @PathVariable String moneda)
+            throws CuentaPorMonedaException {
+        SaldoResponse r = new SaldoResponse();
+
+        double saldo = bs.consultarSaldo(id, moneda);
+
+        r.billeteraId = id;
+        r.moneda = moneda;
+        r.saldo = saldo;
+        return r;
+    }
+
+    @PostMapping("billeteras/{id}/transferencias/{id2}")
+    public TransferenciaResponse postTransferencia(@PathVariable int id, @PathVariable int id2,
+            @RequestBody TransferenciaRequest req) throws CuentaPorMonedaException {
+        TransferenciaResponse r = new TransferenciaResponse();
+
+        int operacionId = bs.transferir(id, id2, req.importe, req.concepto);
+
+        r.isOk = true;
+        r.billeteraIdOrig = id;
+        r.billeteraIdDest = id2;
         r.importe = req.importe;
+        r.concepto = req.concepto;
         r.operacionId = operacionId;
-        return r; //cómo devolver los ids de movimientos? conviene?
+        return r; // cómo devolver los ids de movimientos? conviene?
     }
 }
