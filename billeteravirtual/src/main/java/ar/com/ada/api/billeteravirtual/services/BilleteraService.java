@@ -26,6 +26,9 @@ public class BilleteraService {
     @Autowired
     CuentaService cs;
 
+    @Autowired
+    UsuarioService us;
+
     public void save(Billetera b) {
         repo.save(b);
     }
@@ -48,15 +51,19 @@ public class BilleteraService {
     public double consultarSaldo(int billeteraId, String moneda) throws CuentaPorMonedaException {
         Billetera b = this.buscarPorId(billeteraId);
         Cuenta c = cs.getCuentaPorMoneda(b.getBilleteraId(), moneda);
-        
+
         return c.getSaldo();
     }
 
-    public int transferir(int billeteraIdOrig, int billeteraIdDest, double importe, String concepto)
+    public int transferir(int idOrig, String emailUsuarioDest, double importe, String concepto)
             throws CuentaPorMonedaException {
-        Billetera b1 = this.buscarPorId(billeteraIdOrig);
-        Billetera b2 = this.buscarPorId(billeteraIdDest);
-        // Acá puede quedar un importe negativo, o adaptarlo para que sean todos positivos
+
+        Usuario uDest = us.buscarPorEmail(emailUsuarioDest);
+
+        Billetera b1 = this.buscarPorId(idOrig);
+        Billetera b2 = this.buscarPorId(uDest.getPersona().getBilletera().getBilleteraId());
+        // Acá puede quedar un importe negativo, o adaptarlo para que sean todos
+        // positivos
         int mov = ms.movimientoTransferir(b1, -importe, b1.getCuenta(0), b2.getCuenta(0), concepto);
         ms.movimientoTransferir(b2, importe, b2.getCuenta(0), b1.getCuenta(0), concepto);
         repo.save(b1);
@@ -64,13 +71,10 @@ public class BilleteraService {
         return mov;
     }
 
-    /* cómo devuelvo una lista de cuentas y saldos?
-    public Cuenta getSaldos(int billeteraId){
-        Billetera b = this.buscarPorId(billeteraId);
-        Cuenta c;
-        for (int i = 0; i < b.getCuentas().size(); i++) {
-            c = b.getCuentas().get(i);
-        }
-        return null;
-    }*/
+    /*
+     * cómo devuelvo una lista de cuentas y saldos? public Cuenta getSaldos(int
+     * billeteraId){ Billetera b = this.buscarPorId(billeteraId); Cuenta c; for (int
+     * i = 0; i < b.getCuentas().size(); i++) { c = b.getCuentas().get(i); } return
+     * null; }
+     */
 }

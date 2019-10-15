@@ -17,7 +17,7 @@ public class Movimiento {
     private int movimientoId;
     @Column(name = "fecha_mov")
     private Date fechaMov;
-    private double importe;
+    private double importe; // cambiar todos los importes a BigDecimal, y adaptar las operaciones
     // private Coordenada ubicacion (fase 2);
     private String tipo; // "Entrada" "Salida"
     private String concepto; // "Pagos" "Deposito" "Transferencia" "Cobro"

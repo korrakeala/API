@@ -26,6 +26,9 @@ public class BilleteraController {
     @Autowired
     CuentaService cs;
 
+    @Autowired
+    UsuarioService us;
+
     @PostMapping("billeteras/{id}/depositos")
     public MovimientoResponse postAgregarPlata(@PathVariable int id, @RequestBody MovimientoRequest req) throws CuentaPorMonedaException {
         MovimientoResponse r = new MovimientoResponse();
@@ -84,16 +87,18 @@ public class BilleteraController {
         return r;
     }
 
-    @PostMapping("billeteras/{id}/transferencias/{id2}")
-    public TransferenciaResponse postTransferencia(@PathVariable int id, @PathVariable int id2,
+    @PostMapping("billeteras/{id}/transferencias")
+    public TransferenciaResponse postTransferencia(@PathVariable int id,
             @RequestBody TransferenciaRequest req) throws CuentaPorMonedaException {
         TransferenciaResponse r = new TransferenciaResponse();
 
-        int operacionId = bs.transferir(id, id2, req.importe, req.concepto);
+        int operacionId = bs.transferir(id, req.emailUsuarioDest, req.importe, req.concepto);
+
+        Usuario uDest = us.buscarPorEmail(req.emailUsuarioDest);
 
         r.isOk = true;
         r.billeteraIdOrig = id;
-        r.billeteraIdDest = id2;
+        r.billeteraIdDest = uDest.getPersona().getBilletera().getBilleteraId();
         r.importe = req.importe;
         r.concepto = req.concepto;
         r.operacionId = operacionId;
