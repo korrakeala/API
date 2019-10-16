@@ -1,13 +1,6 @@
 package ar.com.ada.api.billeteravirtual.entities;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import ar.com.ada.api.billeteravirtual.excepciones.PersonaEdadException;
 
@@ -17,6 +10,10 @@ import ar.com.ada.api.billeteravirtual.excepciones.PersonaEdadException;
  */
 @Entity
 @Table(name = "persona")
+@NamedQuery(name = "Persona.findAllByNombreContiene", query = "FROM Persona WHERE nombre like CONCAT('%', ?1,'%')")
+@NamedQuery(name = "Persona.findAllByNombreAndDNI", query = "SELECT p FROM Persona p WHERE p.nombre = ?1 AND p.dni = ?2")
+@NamedNativeQuery(name = "Persona.findAllByNombreConAndEdad", query = "SELECT * FROM persona WHERE nombre like CONCAT('%', ?,'%') AND edad = ?", resultClass = Persona.class)
+// Sólo está definido acá
 public class Persona {
 
     @Id

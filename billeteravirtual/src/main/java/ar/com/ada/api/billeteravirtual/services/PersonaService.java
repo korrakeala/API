@@ -38,6 +38,18 @@ public class PersonaService {
         return repo.findByDni(dni);
     }
 
+    public List<Persona> buscarTodasPorDni(String dni) {
+
+        return repo.findByDniVersion2(dni);
+
+    }
+
+    public List<Persona> buscarTodasPorDniUltimosDig(String descripcion) {
+
+        return repo.findByDniUltimosDig(descripcion);
+
+    }
+
     public Persona buscarPorId(int id) {
 
         Optional<Persona> p = repo.findById(id); //Optional - es una Persona, o es nada
@@ -51,4 +63,15 @@ public class PersonaService {
         
         return repo.findByEmail(email);
     }
+
+    public List<Persona> buscarPersonasOrdenadoPorNombre() {
+
+        return repo.findAllOrderByNombre(); // namedQuery en Persona
+    }
+ 
+    public List<Persona> buscarTodosPorNombre(String nombre) {
+
+        return repo.findAllByNombreContiene(nombre); // namedQuery en Persona
+    }
+    
 }
