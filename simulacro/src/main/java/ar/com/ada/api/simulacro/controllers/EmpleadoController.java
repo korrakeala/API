@@ -78,7 +78,7 @@ public class EmpleadoController {
         Empleado e = es.updateSueldo(id, req.sueldo);
 
         r.isOk = true;
-        r.message = "Empleado " + req.nombre + " actualizado con éxito.";
+        r.message = "Empleado " + e.nombre + " actualizado con éxito.";
         r.empleadoId = e.getId();
         return r;
     }

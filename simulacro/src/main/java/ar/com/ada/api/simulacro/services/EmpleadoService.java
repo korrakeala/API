@@ -3,6 +3,7 @@ package ar.com.ada.api.simulacro.services;
 import java.util.*;
 
 import org.springframework.beans.factory.annotation.*;
+import org.springframework.stereotype.Service;
 
 import ar.com.ada.api.simulacro.entities.*;
 import ar.com.ada.api.simulacro.repos.EmpleadoRepository;
@@ -10,6 +11,7 @@ import ar.com.ada.api.simulacro.repos.EmpleadoRepository;
 /**
  * EmpleadoService
  */
+@Service
 public class EmpleadoService {
 
     @Autowired
@@ -23,7 +25,7 @@ public class EmpleadoService {
         e.setNombre(nombre);
         e.setEdad(edad);
         Categoria c = cs.buscarPorId(categoriaId);
-        e.setCategoria(c.getNombre());
+        e.setCategoria(c);
         e.setSueldo(c.getSueldoBase());
         Date f = new Date();
         e.setFechaAlta(f);
@@ -51,8 +53,9 @@ public class EmpleadoService {
         Empleado e = this.buscarPorId(id);
         e.setNombre(nombre);
         e.setEdad(edad);
-        Categoria c = cs.buscarPorId(categoriaId);
-        e.setCategoria(c.getNombre());
+        //e.getCategoria().getEmpleados().remove(e);
+        e.setCategoria(cs.buscarPorId(categoriaId));
+        //c.getEmpleados().add(e);
         repo.save(e);
         return e;
     }

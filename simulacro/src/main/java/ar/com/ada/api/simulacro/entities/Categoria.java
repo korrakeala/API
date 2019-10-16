@@ -4,6 +4,8 @@ import java.util.*;
 
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * Categoria
  */
@@ -18,11 +20,16 @@ public class Categoria {
     public String nombre;
     @Column(name = "sueldo_base")
     public double sueldoBase;
-    @OneToMany (mappedBy = "categoria", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    public List<Empleado> empleados = new ArrayList<Empleado>();
+    @JsonIgnore
+    @OneToMany (mappedBy = "categoria", cascade = CascadeType.ALL) //fetch = FetchType.EAGER
+    public List<Empleado> empleados;
 
     public int getId() {
         return id;
+    }
+    
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getNombre() {

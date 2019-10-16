@@ -3,6 +3,7 @@ package ar.com.ada.api.simulacro.services;
 import java.util.*;
 
 import org.springframework.beans.factory.annotation.*;
+import org.springframework.stereotype.Service;
 
 import ar.com.ada.api.simulacro.entities.*;
 import ar.com.ada.api.simulacro.exceptions.CategoriaException;
@@ -11,6 +12,7 @@ import ar.com.ada.api.simulacro.repos.CategoriaRepository;
 /**
  * CategoriaService
  */
+@Service
 public class CategoriaService {
 
     @Autowired

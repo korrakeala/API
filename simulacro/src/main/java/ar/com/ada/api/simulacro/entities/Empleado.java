@@ -19,7 +19,7 @@ public class Empleado {
     public int edad;
     @ManyToOne
     @JoinColumn(name = "categoria_id", referencedColumnName = "categoria_id")
-    public String categoria;
+    public Categoria categoria;
     public double sueldo;
     public String estado; //"Activo" o "Baja"
     @Column(name = "fecha_alta")
@@ -47,11 +47,11 @@ public class Empleado {
         this.edad = edad;
     }
 
-    public String getCategoria() {
+    public Categoria getCategoria() {
         return categoria;
     }
 
-    public void setCategoria(String categoria) {
+    public void setCategoria(Categoria categoria) {
         this.categoria = categoria;
     }
 

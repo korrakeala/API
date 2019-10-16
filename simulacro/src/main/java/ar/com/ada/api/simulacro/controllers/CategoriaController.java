@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ar.com.ada.api.simulacro.entities.*;
 import ar.com.ada.api.simulacro.models.request.AltaCatRequest;
 import ar.com.ada.api.simulacro.models.response.AltaCatResponse;
-import ar.com.ada.api.simulacro.services.*;
+import ar.com.ada.api.simulacro.services.CategoriaService;
 
 /**
  * CategoriaController
