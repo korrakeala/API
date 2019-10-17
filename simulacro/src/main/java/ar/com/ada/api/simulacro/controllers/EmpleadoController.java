@@ -59,7 +59,7 @@ public class EmpleadoController {
         return le;
     }
 
-    @PutMapping("/empleados/{id}")
+    @PutMapping("/empleados/{id}") //crear responses y requests específicos
     public EmpResponse updateEmpleado(@PathVariable int id, @RequestBody EmpRequest req){
         EmpResponse r = new EmpResponse();
 
