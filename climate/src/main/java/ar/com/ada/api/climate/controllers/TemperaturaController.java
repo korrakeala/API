@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import ar.com.ada.api.climate.entities.Temperatura;
+import ar.com.ada.api.climate.exceptions.TemperaturaExistenteException;
 import ar.com.ada.api.climate.models.request.TemperaturaRegRequest;
 import ar.com.ada.api.climate.models.response.TemperaturaBajaResponse;
 import ar.com.ada.api.climate.models.response.TemperaturaRegResponse;
 import ar.com.ada.api.climate.services.PaisService;
 import ar.com.ada.api.climate.services.TemperaturaService;
-
 
 /**
  * TemperaturaController
@@ -31,7 +31,8 @@ public class TemperaturaController {
     PaisService ps;
 
     @PostMapping("/temperaturas")
-    public TemperaturaRegResponse postTemperatura(@RequestBody TemperaturaRegRequest req) {
+    public TemperaturaRegResponse postTemperatura(@RequestBody TemperaturaRegRequest req)
+            throws TemperaturaExistenteException {
         TemperaturaRegResponse r = new TemperaturaRegResponse();
         
         Temperatura t= ts.altaTemperatura(req.codigoPais, req.anio, req.grados);

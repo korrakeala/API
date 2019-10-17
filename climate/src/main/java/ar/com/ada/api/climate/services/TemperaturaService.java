@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import ar.com.ada.api.climate.entities.Temperatura;
+import ar.com.ada.api.climate.exceptions.TemperaturaExistenteException;
 import ar.com.ada.api.climate.repos.TemperaturaRepository;
 
 /**
@@ -20,14 +21,16 @@ public class TemperaturaService {
     @Autowired
     PaisService ps;
 
-    public Temperatura altaTemperatura(int codigoPais, int anio, double grados) {
+    public Temperatura altaTemperatura(int codigoPais, int anio, double grados) throws TemperaturaExistenteException {
         Temperatura t = new Temperatura();
         t.setPais(ps.buscarPorId(codigoPais));
         t.setAnio(anio);
         t.setGrados(grados);
-        // que no permita cargar una temperatura ya existente para el año especificado. Es decir, si
-        //hay una temperatura en el país correspondiente al año ingresado, debe generar un error. 
-
+        for (Temperatura temp : t.getPais().getTemperaturas()) {
+            if (temp.getAnio() == t.getAnio()) {
+                throw new TemperaturaExistenteException("Ya existe una temperatura para el año "+ anio);
+            }
+        }
         return t;
     }
 
