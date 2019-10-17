@@ -1,5 +1,6 @@
 package ar.com.ada.api.climate.controllers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 import ar.com.ada.api.climate.entities.Temperatura;
 import ar.com.ada.api.climate.exceptions.TemperaturaExistenteException;
 import ar.com.ada.api.climate.models.request.TemperaturaRegRequest;
+import ar.com.ada.api.climate.models.response.ListaTempAnioResponse;
+import ar.com.ada.api.climate.models.response.TempMaxResponse;
 import ar.com.ada.api.climate.models.response.TemperaturaBajaResponse;
 import ar.com.ada.api.climate.models.response.TemperaturaRegResponse;
 import ar.com.ada.api.climate.services.PaisService;
@@ -59,5 +62,32 @@ public class TemperaturaController {
         return r;
     }
 
-    
+    @GetMapping("/temperaturas/anios/{anio}") //falta formatear el json
+    public List<ListaTempAnioResponse> getTemperaturasPorAnio(@PathVariable int anio){
+        List<ListaTempAnioResponse> lr = new ArrayList<ListaTempAnioResponse>();
+        ListaTempAnioResponse r = new ListaTempAnioResponse();
+        List<Temperatura> lt = ts.listarTemperaturasPorAnio(anio);
+
+        for (Temperatura t : lt) {
+            r.nombrePais = t.getPais().getNombre();
+            r.grados = t.getGrados();
+            lr.add(r);
+        }
+
+        return lr;
+    }
+
+    @GetMapping("/temperaturas/maximas/{codigoPais}")
+    public TempMaxResponse getTemperaturaMaximaPais(@PathVariable int codigoPais){
+        TempMaxResponse r = new TempMaxResponse();
+        
+        Temperatura t = ts.buscarTemperaturaMaximaPais(codigoPais);
+        
+        r.nombrePais = t.getPais().getNombre();
+        r.temperaturaMaxima = t.getGrados();
+        r.anio = t.getAnio();
+        return r;
+        
+    }
+
 }
