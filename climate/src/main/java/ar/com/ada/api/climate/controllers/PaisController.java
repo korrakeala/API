@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import ar.com.ada.api.climate.entities.Pais;
+import ar.com.ada.api.climate.exceptions.CodigoPaisException;
 import ar.com.ada.api.climate.models.request.PaisNombreRequest;
 import ar.com.ada.api.climate.models.request.PaisRequest;
 import ar.com.ada.api.climate.models.response.PaisResponse;
@@ -30,7 +31,7 @@ public class PaisController {
     PaisService ps;
 
     @PostMapping("/paises")
-    public PaisResponse postMethodName(@RequestBody PaisRequest req) {
+    public PaisResponse postMethodName(@RequestBody PaisRequest req) throws CodigoPaisException {
         PaisResponse r = new PaisResponse();
         
         int codigoPais = ps.altaPais(req.codigoPais, req.nombre);
