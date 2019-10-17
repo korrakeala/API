@@ -31,6 +31,7 @@ public class TemperaturaService {
                 throw new TemperaturaExistenteException("Ya existe una temperatura para el año "+ anio);
             }
         }
+        repo.save(t);
         return t;
     }
 

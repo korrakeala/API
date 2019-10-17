@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import ar.com.ada.api.climate.entities.Pais;
 import ar.com.ada.api.climate.entities.Temperatura;
-import ar.com.ada.api.climate.exceptions.TemperaturaException;
 import ar.com.ada.api.climate.repos.PaisRepository;
 
 /**
@@ -21,9 +20,7 @@ public class PaisService {
     PaisRepository repo;
 
     public int altaPais(int codigo, String nombre) {
-        Pais p = new Pais();
-        p.setCodigoPais(codigo);
-        p.setNombre(nombre);
+        Pais p = new Pais(codigo, nombre);
         repo.save(p);
 
         return p.getCodigoPais();
@@ -51,12 +48,7 @@ public class PaisService {
     }
 
     public List<Temperatura> getTemperaturasPorPais(int codigoPais){
-        for (Pais p : repo.findAll()) {
-            if (p.getCodigoPais() == codigoPais) {
-                Pais pa = buscarPorId(codigoPais);
-                return pa.getTemperaturas();
-            }
-        }
-        return null;
+        Pais p = this.buscarPorId(codigoPais);
+        return p.getTemperaturas();
     }
 }
