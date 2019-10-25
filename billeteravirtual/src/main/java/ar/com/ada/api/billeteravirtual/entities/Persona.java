@@ -2,6 +2,8 @@ package ar.com.ada.api.billeteravirtual.entities;
 
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import ar.com.ada.api.billeteravirtual.excepciones.PersonaEdadException;
 
 
@@ -24,6 +26,7 @@ public class Persona {
     private String dni;
     private int edad;
     private String email;
+    @JsonIgnore
     @OneToOne(mappedBy = "persona", cascade = CascadeType.ALL)
     private Billetera billetera;
     //@Column(name = "billetera_id")

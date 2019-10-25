@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
 import ar.com.ada.api.billeteravirtual.repo.UsuarioRepository;
@@ -85,6 +86,17 @@ public class UsuarioService {
         if (u.isPresent())
             return u.get();
         return null;
+    }
+
+    public void login(String username, String password) {
+
+        Usuario u = repo.findByUserName(username);
+
+        if (u == null || !u.getPassword().equals(Crypto.encrypt(password, u.getUserName()))) {
+
+            throw new BadCredentialsException("Usuario o contraseña invalida");
+        }
+
     }
     
 

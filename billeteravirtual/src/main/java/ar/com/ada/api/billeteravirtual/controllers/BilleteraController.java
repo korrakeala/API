@@ -1,8 +1,10 @@
 package ar.com.ada.api.billeteravirtual.controllers;
 
+import java.security.Principal;
 import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import ar.com.ada.api.billeteravirtual.entities.*;
@@ -30,7 +32,8 @@ public class BilleteraController {
     UsuarioService us;
 
     @PostMapping("billeteras/{id}/depositos")
-    public MovimientoResponse postAgregarPlata(@PathVariable int id, @RequestBody MovimientoRequest req) throws CuentaPorMonedaException {
+    public MovimientoResponse postAgregarPlata(@PathVariable int id, @RequestBody MovimientoRequest req)
+            throws CuentaPorMonedaException {
         MovimientoResponse r = new MovimientoResponse();
 
         int movimientoId = ms.depositarExtraer(id, req.moneda, req.concepto, req.importe, "Entrada");
@@ -45,7 +48,8 @@ public class BilleteraController {
     }
 
     @PostMapping("billeteras/{id}/extracciones")
-    public MovimientoResponse postExtraerPlata(@PathVariable int id, @RequestBody MovimientoRequest req) throws CuentaPorMonedaException {
+    public MovimientoResponse postExtraerPlata(@PathVariable int id, @RequestBody MovimientoRequest req)
+            throws CuentaPorMonedaException {
         MovimientoResponse r = new MovimientoResponse();
         // req.importe en negativo para respetar lógica de entradas positivas y salidas
         // negativas
@@ -61,17 +65,21 @@ public class BilleteraController {
     }
 
     @GetMapping("/billeteras/{id}/saldos")
-    public ArrayList<SaldoResponse> getSaldos(@PathVariable int id) {
+    public ArrayList<SaldoResponse> getSaldos(Authentication authentication, Principal principal,
+            @PathVariable int id) throws UsuarioNoAutorizadoException {
         Billetera b = bs.buscarPorId(id);
-        ArrayList<SaldoResponse> ls = new ArrayList<>();
-        for (Cuenta c : b.getCuentas()) {
-            SaldoResponse r = new SaldoResponse();
-            r.billeteraId = id;
-            r.moneda = c.getMoneda();
-            r.saldo = c.getSaldo();
-            ls.add(r);
+        if (b.getPersona().getUsuario().getUserName().equals(principal.getName())) {
+            ArrayList<SaldoResponse> ls = new ArrayList<>();
+            for (Cuenta c : b.getCuentas()) {
+                SaldoResponse r = new SaldoResponse();
+                r.billeteraId = id;
+                r.moneda = c.getMoneda();
+                r.saldo = c.getSaldo();
+                ls.add(r);
+            }
+            return ls;
         }
-        return ls;
+        throw new UsuarioNoAutorizadoException("El usuario no posee permisos para consultar esa billetera.");
     }
 
     @GetMapping("billeteras/{id}/saldos/{moneda}")
@@ -88,8 +96,8 @@ public class BilleteraController {
     }
 
     @PostMapping("billeteras/{id}/transferencias")
-    public TransferenciaResponse postTransferencia(@PathVariable int id,
-            @RequestBody TransferenciaRequest req) throws CuentaPorMonedaException {
+    public TransferenciaResponse postTransferencia(@PathVariable int id, @RequestBody TransferenciaRequest req)
+            throws CuentaPorMonedaException {
         TransferenciaResponse r = new TransferenciaResponse();
 
         int operacionId = bs.transferir(id, req.emailUsuarioDest, req.importe, req.concepto);
@@ -117,7 +125,7 @@ public class BilleteraController {
         bs.save(b);
 
         r.billeteraId = id;
-        r.message = "Cuenta en "+ moneda + " generada con éxito.";
+        r.message = "Cuenta en " + moneda + " generada con éxito.";
         r.isOk = true;
         return r;
 
