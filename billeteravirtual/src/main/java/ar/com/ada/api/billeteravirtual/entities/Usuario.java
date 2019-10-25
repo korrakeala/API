@@ -2,6 +2,8 @@ package ar.com.ada.api.billeteravirtual.entities;
 
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * Usuario
  */
@@ -20,6 +22,7 @@ public class Usuario {
     private String userEmail;
     @OneToOne
     @JoinColumn(name= "persona_id", referencedColumnName = "persona_id")
+    @JsonIgnore
     private Persona persona;
     //@Column(name = "persona_id")
     //private int personaId;
