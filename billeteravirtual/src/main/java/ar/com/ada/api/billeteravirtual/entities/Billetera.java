@@ -1,5 +1,6 @@
 package ar.com.ada.api.billeteravirtual.entities;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 import javax.persistence.*;
@@ -62,8 +63,8 @@ public class Billetera {
         p.setBilletera(this);
     }
 
-    public double consultarSaldoDisponible(Billetera b, String moneda) {
-        double s = 0;
+    public BigDecimal consultarSaldoDisponible(Billetera b, String moneda) {
+        BigDecimal s = null;
         for (Cuenta c : b.getCuentas()) {
             if (c.getMoneda().equals(moneda)){
                 s = c.getSaldoDisponible();

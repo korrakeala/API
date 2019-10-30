@@ -5,6 +5,7 @@ import javax.persistence.*;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -20,9 +21,9 @@ public class Cuenta {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int cuentaId;
     private String moneda; // monedaId?
-    private double saldo; // (balance)
+    private BigDecimal saldo = new BigDecimal(0); // (balance)
     @Column(name = "saldo_disponible")
-    private double saldoDisponible;
+    private BigDecimal saldoDisponible = new BigDecimal(0);
     // private String nroCuenta; // (univoco)
     @ManyToOne
     @JoinColumn(name = "billetera_id", referencedColumnName = "billetera_id")
@@ -73,11 +74,11 @@ public class Cuenta {
         this.moneda = moneda;
     }
 
-    public double getSaldo() {
+    public BigDecimal getSaldo() {
         return saldo;
     }
 
-    public void setSaldo(double saldo) {
+    public void setSaldo(BigDecimal saldo) {
         this.saldo = saldo;
     }
 
@@ -99,12 +100,12 @@ public class Cuenta {
     }
 
     //falta poner límite para no tener saldos negativos
-    public double getSaldoDisponible() {
+    public BigDecimal getSaldoDisponible() {
         return saldo;
     }
 
-    public void setSaldoDisponible(double saldoDisponible) {
-        this.saldoDisponible = 0;
+    public void setSaldoDisponible(BigDecimal saldoDisponible) {
+        this.saldoDisponible = null;
     }
 
     // Adaptar para sacar el print del método.

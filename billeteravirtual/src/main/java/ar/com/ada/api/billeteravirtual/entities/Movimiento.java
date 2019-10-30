@@ -1,5 +1,6 @@
 package ar.com.ada.api.billeteravirtual.entities;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 import javax.persistence.*;
@@ -17,7 +18,7 @@ public class Movimiento {
     private int movimientoId;
     @Column(name = "fecha_mov")
     private Date fechaMov;
-    private double importe; // cambiar todos los importes a BigDecimal, y adaptar las operaciones
+    private BigDecimal importe = new BigDecimal(0); // cambiar todos los importes a BigDecimal, y adaptar las operaciones
     // private Coordenada ubicacion (fase 2);
     private String tipo; // "Entrada" "Salida"
     private String concepto; // "Pagos" "Deposito" "Transferencia" "Cobro"
@@ -102,11 +103,11 @@ public class Movimiento {
         this.cuentaOrigenId = cuentaOrigenId;
     }
 
-    public double getImporte() {
+    public BigDecimal getImporte() {
         return importe;
     }
 
-    public void setImporte(double importe) {
+    public void setImporte(BigDecimal importe) {
         this.importe = importe;
     }
 
@@ -145,7 +146,7 @@ public class Movimiento {
         System.out.println("Gracias por crear tu billetera! te regalamos " + c.getMoneda() + " 100 para que empieces a usarla.");
         Date f = new Date();
         this.setConcepto("Carga inicial");
-        this.setImporte(100);
+        this.setImporte(new BigDecimal(100));
         this.setTipo("Entrada");
         this.setFechaMov(f);
         this.setCuentaOrigenId(c.getCuentaId());
@@ -153,10 +154,10 @@ public class Movimiento {
         this.setaUsuarioId(u.getUsuarioId());
         this.setDeUsuarioId(u.getUsuarioId());
         if (this.getTipo().equals("Entrada")) {
-            c.setSaldo(c.getSaldo() + this.getImporte());
+            c.setSaldo(c.getSaldo().add(this.getImporte()));
             c.setSaldoDisponible(c.getSaldo());
         } else {
-            c.setSaldo(c.getSaldo() - this.getImporte());
+            c.setSaldo(c.getSaldo().add(this.getImporte()));
             c.setSaldoDisponible(c.getSaldo());
         }
         this.setCuenta(c);

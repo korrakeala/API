@@ -1,5 +1,6 @@
 package ar.com.ada.api.billeteravirtual.controllers;
 
+import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.*;
 
@@ -12,6 +13,7 @@ import ar.com.ada.api.billeteravirtual.excepciones.*;
 import ar.com.ada.api.billeteravirtual.models.request.*;
 import ar.com.ada.api.billeteravirtual.models.response.*;
 import ar.com.ada.api.billeteravirtual.services.*;
+import ar.com.ada.api.billeteravirtual.sistema.comms.EmailService;
 
 /**
  * BilleteraController
@@ -31,13 +33,16 @@ public class BilleteraController {
     @Autowired
     UsuarioService us;
 
+    @Autowired
+    EmailService emailService;
+
     @PostMapping("billeteras/{id}/depositos")
     public MovimientoResponse postAgregarPlata(@PathVariable int id, @RequestBody MovimientoRequest req)
             throws CuentaPorMonedaException {
         MovimientoResponse r = new MovimientoResponse();
 
         int movimientoId = ms.depositarExtraer(id, req.moneda, req.concepto, req.importe, "Entrada");
-
+       
         r.isOk = true;
         r.message = "Transacción exitosa.";
         r.billeteraId = id;
@@ -53,7 +58,7 @@ public class BilleteraController {
         MovimientoResponse r = new MovimientoResponse();
         // req.importe en negativo para respetar lógica de entradas positivas y salidas
         // negativas
-        int movimientoId = ms.depositarExtraer(id, req.moneda, req.concepto, -req.importe, "Salida");
+        int movimientoId = ms.depositarExtraer(id, req.moneda, req.concepto, req.importe.negate(), "Salida");
 
         r.isOk = true;
         r.message = "Transacción exitosa.";
@@ -87,7 +92,7 @@ public class BilleteraController {
             throws CuentaPorMonedaException {
         SaldoResponse r = new SaldoResponse();
 
-        double saldo = bs.consultarSaldo(id, moneda);
+        BigDecimal saldo = bs.consultarSaldo(id, moneda);
 
         r.billeteraId = id;
         r.moneda = moneda;
@@ -121,7 +126,7 @@ public class BilleteraController {
         Billetera b = bs.buscarPorId(id);
         Cuenta c = new Cuenta(b, moneda);
         bs.save(b);
-        ms.depositarExtraer(id, moneda, "Carga inicial", 50, "Entrada");
+        ms.depositarExtraer(id, moneda, "Carga inicial", (new BigDecimal(50)), "Entrada");
         bs.save(b);
 
         r.billeteraId = id;

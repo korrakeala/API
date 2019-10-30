@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import ar.com.ada.api.billeteravirtual.excepciones.CuentaPorMonedaException;
 import ar.com.ada.api.billeteravirtual.excepciones.PersonaEdadException;
 import ar.com.ada.api.billeteravirtual.models.request.LoginRequest;
 import ar.com.ada.api.billeteravirtual.models.request.RegistrationRequest;
@@ -24,7 +25,7 @@ public class AuthController {
 
     @Autowired
     UsuarioService usuarioService;
-    
+
     @Autowired
     private JWTTokenUtil jwtTokenUtil;
 
@@ -32,11 +33,13 @@ public class AuthController {
     private JWTUserDetailsService userDetailsService;
 
     @PostMapping("auth/register")
-    public RegistrationResponse postRegisterUser(@RequestBody RegistrationRequest req) throws PersonaEdadException {
+    public RegistrationResponse postRegisterUser(@RequestBody RegistrationRequest req)
+            throws PersonaEdadException, CuentaPorMonedaException {
         RegistrationResponse r = new RegistrationResponse();
         //aca creamos la persona y el usuario a traves del service.
+        // hacer método baja para no perder mails válidos en las pruebas
 
-        int usuarioCreadoId = usuarioService.alta(req.fullName, req.dni, req.email, req.edad, req.password, req.moneda, req.userEmail);
+        int usuarioCreadoId = usuarioService.alta(req.fullName, req.dni, req.email, req.edad, req.password);
 
         r.isOk = true;
         r.message = "Te registraste con exitoooo";

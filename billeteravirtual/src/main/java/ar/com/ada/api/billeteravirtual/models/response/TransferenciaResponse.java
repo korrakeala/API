@@ -1,5 +1,7 @@
 package ar.com.ada.api.billeteravirtual.models.response;
 
+import java.math.BigDecimal;
+
 /**
  * TransferenciaResponse
  */
@@ -9,7 +11,7 @@ public class TransferenciaResponse {
     public String message = "";
     public int billeteraIdOrig;
     public int billeteraIdDest;
-    public double importe;
+    public BigDecimal importe;
     public String concepto;
     public int operacionId;
 }
