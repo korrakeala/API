@@ -46,18 +46,32 @@ public class PersonaController {
 
         if (u.getTipoUsuario().equals("Admin")) {
             List<Persona> lp;
-            if (nombre.equals(null) && descripcion.equals(null)) {
-                lp = ps.buscarPersonasOrdenadoPorNombre();
-                return lp;
-            }
-            if (!nombre.equals(null)) {
+            if (nombre != null) {
                 lp = ps.buscarTodosPorNombre(nombre);
                 return lp;
             }
-            if (!descripcion.equals(null)) {
-                lp = ps.buscarTodasPorDniUltimosDig(descripcion);
+            if (descripcion != null) {
+                lp = ps.buscarTodasPorDniUltimosDig(descripcion); //por qué no funciona éste método?
                 return lp;
             }
+            if (nombre == null && descripcion == null) { //por qué no funciona si uso equals?? me da NullPointerException
+                lp = ps.buscarPersonasOrdenadoPorNombre();
+                return lp;
+            }
+            /*if (nombre == null && descripcion == null) { //por qué no funciona si uso equals??
+                lp = ps.buscarPersonasOrdenadoPorNombre();
+                return lp;
+            } else {
+                if (nombre != null) {
+                    lp = ps.buscarTodosPorNombre(nombre);
+                    return lp;
+                } else {
+                    if (descripcion != null) {
+                        lp = ps.buscarTodasPorDniUltimosDig(descripcion); //por qué no funciona éste método?
+                        return lp;
+                    }
+                }
+            }*/
         }
         throw new UsuarioNoAutorizadoException("El usuario no posee autorización para realizar esta acción.");
     }

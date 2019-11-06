@@ -39,7 +39,7 @@ public class BilleteraController {
     @Autowired
     PersonaService ps;
 
-    @PostMapping("billeteras/{id}/depositos")
+    @PostMapping("/billeteras/{id}/depositos")
     public MovimientoResponse postAgregarPlata(Principal principal, @PathVariable int id,
             @RequestBody MovimientoRequest req) throws CuentaPorMonedaException, UsuarioNoAutorizadoException {
         MovimientoResponse r = new MovimientoResponse();
@@ -63,7 +63,7 @@ public class BilleteraController {
 
     }
 
-    @PostMapping("billeteras/{id}/extracciones")
+    @PostMapping("/billeteras/{id}/extracciones")
     public MovimientoResponse postExtraerPlata(Principal principal, @PathVariable int id,
             @RequestBody MovimientoRequest req) throws CuentaPorMonedaException, UsuarioNoAutorizadoException {
         MovimientoResponse r = new MovimientoResponse();
@@ -110,7 +110,7 @@ public class BilleteraController {
         throw new UsuarioNoAutorizadoException("El usuario no posee permisos para consultar esa billetera.");
     }
 
-    @GetMapping("billeteras/{id}/saldos/{moneda}")
+    @GetMapping("/billeteras/{id}/saldos/{moneda}")
     public SaldoResponse getConsultarSaldo(Principal principal, @PathVariable int id, @PathVariable String moneda)
             throws CuentaPorMonedaException, UsuarioNoAutorizadoException {
         SaldoResponse r = new SaldoResponse();
@@ -132,7 +132,7 @@ public class BilleteraController {
 
     }
 
-    @PostMapping("billeteras/{id}/transferencias")
+    @PostMapping("/billeteras/{id}/transferencias")
     public TransferenciaResponse postTransferencia(Principal principal, @PathVariable int id,
             @RequestBody TransferenciaRequest req) throws CuentaPorMonedaException, UsuarioNoAutorizadoException {
         TransferenciaResponse r = new TransferenciaResponse();
@@ -159,7 +159,7 @@ public class BilleteraController {
         // cómo devolver los ids de movimientos? conviene?
     }
 
-    @PostMapping("billeteras/{id}/cuentas/{moneda}")
+    @PostMapping("/billeteras/{id}/cuentas/{moneda}")
     public CrearCuentaResponse postCuenta(Principal principal, @PathVariable int id, @PathVariable String moneda)
             throws UsuarioNoAutorizadoException {
         CrearCuentaResponse r = new CrearCuentaResponse();
@@ -181,7 +181,7 @@ public class BilleteraController {
 
     }
 
-    @GetMapping("billeteras/")
+    @GetMapping("/billeteras") //cómo hago para que las cuentas no muestren el usuario de nuevo?
     public List<Billetera> getBilleteras(Principal principal) throws UsuarioNoAutorizadoException {
         Usuario u = us.buscarPorUserName(principal.getName());
 

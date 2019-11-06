@@ -33,6 +33,7 @@ public class CuentaService {
         Billetera b = bs.buscarPorId(billeteraId);
         Cuenta c = new Cuenta();
         c.setMoneda(moneda);
+        c.setBilletera(b);
         b.getCuentas().add(c);
         bs.save(b);
 

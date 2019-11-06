@@ -30,7 +30,7 @@ public interface PersonaRepository extends JpaRepository<Persona, Integer> {
     @Query("SELECT p FROM Persona p WHERE p.dni = :dni")
     List<Persona> findByDniVersion2(@Param("dni") String descripcion);
 
-    @Query("SELECT p FROM Persona p WHERE p.dni like CONCAT('%', dni)")
-    List<Persona> findByDniUltimosDig(@Param("dni") String descripcion);
+    //@Query("SELECT p FROM Persona p WHERE p.dni like CONCAT('%', dni)")
+    List<Persona> findByDniUltimosDig(String descripcion);
 
 }

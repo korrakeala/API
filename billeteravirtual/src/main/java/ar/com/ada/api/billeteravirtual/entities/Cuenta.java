@@ -2,6 +2,8 @@ package ar.com.ada.api.billeteravirtual.entities;
 
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
@@ -27,12 +29,12 @@ public class Cuenta {
     // private String nroCuenta; // (univoco)
     @ManyToOne
     @JoinColumn(name = "billetera_id", referencedColumnName = "billetera_id")
+    @JsonIgnore
     private Billetera billetera;
     @OneToMany (mappedBy = "cuenta", cascade = CascadeType.ALL)
     @LazyCollection (LazyCollectionOption.FALSE)
+    @JsonIgnore
     private List<Movimiento> movimientos = new ArrayList<Movimiento>(); // (puede necesitar tabla intermedia)
-
-    public static Scanner Teclado = new Scanner(System.in);
 
     void dineroPendiente() {
 
