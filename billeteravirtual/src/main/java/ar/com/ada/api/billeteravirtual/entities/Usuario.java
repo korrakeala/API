@@ -17,6 +17,7 @@ public class Usuario {
     private int usuarioId;
     @Column(name = "username")
     private String userName;
+    @JsonIgnore
     private String password;
     @Column(name = "email")
     private String userEmail;

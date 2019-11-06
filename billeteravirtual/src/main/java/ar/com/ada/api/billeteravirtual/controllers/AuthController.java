@@ -43,7 +43,7 @@ public class AuthController {
         Usuario usuarioCreado = usuarioService.alta(req.fullName, req.dni, req.email, req.edad, req.password);
 
         r.isOk = true;
-        r.message = "Te registraste con exitoooo";
+        r.message = "Te registraste con éxito, guardá tu número de billetera porque después no lo vas a poder ver!";
         r.usuarioId = usuarioCreado.getUsuarioId();
         r.billeteraId = usuarioCreado.getPersona().getBilletera().getBilleteraId();
         return r;
