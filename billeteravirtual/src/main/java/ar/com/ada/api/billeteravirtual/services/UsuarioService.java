@@ -36,7 +36,7 @@ public class UsuarioService {
     @Autowired
     EmailService emailService;
 
-    public int alta(String fullName, String dni, String email, int edad, String password)
+    public Usuario alta(String fullName, String dni, String email, int edad, String password)
             throws PersonaEdadException, CuentaPorMonedaException {
         Persona p = new Persona();
         p.setNombre(fullName);
@@ -70,7 +70,7 @@ public class UsuarioService {
 
         ms.depositarExtraer(b.getBilleteraId(), c.getMoneda(), "Carga inicial", (new BigDecimal(100)), "Entrada");
 
-        return u.getUsuarioId();
+        return u;
     }
 
     public void save(Usuario u) {
