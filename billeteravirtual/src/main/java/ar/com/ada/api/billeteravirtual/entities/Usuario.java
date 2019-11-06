@@ -25,13 +25,16 @@ public class Usuario {
     @JoinColumn(name= "persona_id", referencedColumnName = "persona_id")
     @JsonIgnore
     private Persona persona;
+    @Column(name = "tipo_usuario")
+    private String tipoUsuario;
     //@Column(name = "persona_id")
     //private int personaId;
 
-    public Usuario (String userName, String password, String email){
+    public Usuario (String userName, String password, String email, String tipoUsuario){
         this.userName = userName;
         this.password = password;
         this.userEmail = email;
+        this.tipoUsuario = tipoUsuario;
     }
 
     public Usuario(){
@@ -80,6 +83,14 @@ public class Usuario {
 
     public void setPersona(Persona persona) {
         this.persona = persona;
+    }
+
+    public String getTipoUsuario() {
+        return tipoUsuario;
+    }
+
+    public void setTipoUsuario(String tipoUsuario) {
+        this.tipoUsuario = tipoUsuario;
     }
    
 

@@ -25,7 +25,7 @@ import ar.com.ada.api.billeteravirtual.models.response.JwtResponse;
 public class AuthController {
 
     @Autowired
-    UsuarioService usuarioService;
+    UsuarioService us;
 
     @Autowired
     private JWTTokenUtil jwtTokenUtil;
@@ -40,21 +40,33 @@ public class AuthController {
         //aca creamos la persona y el usuario a traves del service.
         // hacer método baja para no perder mails válidos en las pruebas
 
-        Usuario usuarioCreado = usuarioService.alta(req.fullName, req.dni, req.email, req.edad, req.password);
+        Usuario usuarioCreado = us.altaUsuario(req.fullName, req.dni, req.email, req.edad, req.password);
 
         r.isOk = true;
-        r.message = "Te registraste con éxito, guardá tu número de billetera porque después no lo vas a poder ver!";
+        r.message = "Te registraste con éxito, guardá tu número de billetera porque después lo vas a necesitar!";
         r.usuarioId = usuarioCreado.getUsuarioId();
         r.billeteraId = usuarioCreado.getPersona().getBilletera().getBilleteraId();
         return r;
+    }
 
+    @PostMapping("auth/register/admin")
+    public RegistrationResponse postRegisterAdmin(@RequestBody RegistrationRequest req)
+            throws PersonaEdadException, CuentaPorMonedaException {
+        RegistrationResponse r = new RegistrationResponse();
+
+        Usuario admin = us.altaAdmin(req.fullName, req.dni, req.email, req.edad, req.password);
+
+        r.isOk = true;
+        r.message = "Te registraste como Admin con éxito!";
+        r.usuarioId = admin.getUsuarioId();
+        return r;
     }
 
     @PostMapping("auth/login")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody LoginRequest authenticationRequest)
             throws Exception {
 
-        usuarioService.login(authenticationRequest.userName, authenticationRequest.password);
+        us.login(authenticationRequest.userName, authenticationRequest.password);
 
         final UserDetails userDetails = userDetailsService
             .loadUserByUsername(authenticationRequest.userName);

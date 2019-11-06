@@ -9,6 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import ar.com.ada.api.billeteravirtual.entities.Persona;
+import ar.com.ada.api.billeteravirtual.excepciones.UsuarioNoAutorizadoException;
 import ar.com.ada.api.billeteravirtual.services.PersonaService;
 
 /**
@@ -16,9 +17,9 @@ import ar.com.ada.api.billeteravirtual.services.PersonaService;
  */
 @RestController
 public class PersonaController {
-    
+
     @Autowired
-    PersonaService personaService;
+    PersonaService ps;
 
     /**
      * Este metodo tiene un queryString que viene por url y es opcional, este campo
@@ -30,35 +31,50 @@ public class PersonaController {
      * 
      * @param nombre
      * @return
+     * @throws UsuarioNoAutorizadoException
      */
     @GetMapping("/personas")
-    public List<Persona> getPersonas(Authentication authentication, Principal principal, @RequestParam(value = "nombre", required = false) String nombre) {
-        List<Persona> lp;
-        
-        if (nombre == null) {
-            lp = personaService.buscarPersonasOrdenadoPorNombre();
-        } else {
-            lp = personaService.buscarTodosPorNombre(nombre);
-        }
+    public List<Persona> getPersonas(Principal principal,
+            @RequestParam(value = "nombre", required = false) String nombre) throws UsuarioNoAutorizadoException {
+        Persona p = ps.buscarPorNombre(principal.getName());
 
-        return lp;
+        if (p.getUsuario().getTipoUsuario().equals("Admin")) {
+            List<Persona> lp;
+            if (nombre == null) {
+                lp = ps.buscarPersonasOrdenadoPorNombre();
+            } else {
+                lp = ps.buscarTodosPorNombre(nombre);
+            }
+            return lp;
+        }
+        throw new UsuarioNoAutorizadoException("El usuario no posee autorización para realizar esta acción.");
     }
 
     @GetMapping("/personas/{id}")
-    public ResponseEntity<Persona> getPersonaById(@PathVariable int id) {
-        Persona p = personaService.buscarPorId(id);
+    public ResponseEntity<Persona> getPersonaById(@PathVariable int id, Principal principal)
+            throws UsuarioNoAutorizadoException {
+        Persona per = ps.buscarPorNombre(principal.getName());
 
-        if (p == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if (per.getUsuario().getTipoUsuario().equals("Admin")) {
+            Persona p = ps.buscarPorId(id);
+            if (p == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            return ResponseEntity.ok(p);
         }
-        return ResponseEntity.ok(p);
+        throw new UsuarioNoAutorizadoException("El usuario no posee autorización para realizar esta acción.");
     }
 
-    //@GetMapping("/personas")
-    public List<Persona> getPersonasByDNIUltimosDig(@RequestParam(value = "dni", required = false) String descripcion){
-        List<Persona> lp = personaService.buscarTodasPorDniUltimosDig(descripcion);
-        return lp;
+    @GetMapping("/personas")
+    public List<Persona> getPersonasByDNIUltimosDig(@RequestParam(value = "dni", required = false) String descripcion,
+            Principal principal) throws UsuarioNoAutorizadoException {
+        Persona p = ps.buscarPorNombre(principal.getName());
+
+        if (p.getUsuario().getTipoUsuario().equals("Admin")) {
+            List<Persona> lp = ps.buscarTodasPorDniUltimosDig(descripcion);
+            return lp;
+        }
+        throw new UsuarioNoAutorizadoException("El usuario no posee autorización para realizar esta acción.");
     }
 
-    
 }

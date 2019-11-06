@@ -29,5 +29,15 @@ public class CuentaService {
         throw new CuentaPorMonedaException("La billetera no posee una cuenta en " + moneda + ".");
     }
 
+    public Cuenta crearCuenta(int billeteraId, String moneda) {
+        Billetera b = bs.buscarPorId(billeteraId);
+        Cuenta c = new Cuenta();
+        c.setMoneda(moneda);
+        b.getCuentas().add(c);
+        bs.save(b);
+
+        return c;
+    }
+
 
 }

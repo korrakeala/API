@@ -36,7 +36,7 @@ public class UsuarioService {
     @Autowired
     EmailService emailService;
 
-    public Usuario alta(String fullName, String dni, String email, int edad, String password)
+    public Usuario altaUsuario(String fullName, String dni, String email, int edad, String password)
             throws PersonaEdadException, CuentaPorMonedaException {
         Persona p = new Persona();
         p.setNombre(fullName);
@@ -47,6 +47,7 @@ public class UsuarioService {
         Usuario u = new Usuario();
         u.setUserName(p.getEmail());
         u.setUserEmail(p.getEmail());
+        u.setTipoUsuario("usuario");
 
         String passwordEnTextoClaro;
         String passwordEncriptada;
@@ -69,6 +70,37 @@ public class UsuarioService {
                         + "Ademas te regalamos 100 pesitos");
 
         ms.depositarExtraer(b.getBilleteraId(), c.getMoneda(), "Carga inicial", (new BigDecimal(100)), "Entrada");
+
+        return u;
+    }
+
+    public Usuario altaAdmin(String fullName, String dni, String email, int edad, String password)
+            throws PersonaEdadException, CuentaPorMonedaException {
+        Persona p = new Persona();
+        p.setNombre(fullName);
+        p.setDni(dni);
+        p.setEmail(email);
+        p.setEdad(edad);
+
+        Usuario u = new Usuario();
+        u.setUserName(p.getEmail());
+        u.setUserEmail(p.getEmail());
+        u.setTipoUsuario("admin");
+
+        String passwordEnTextoClaro;
+        String passwordEncriptada;
+
+        passwordEnTextoClaro = password;
+        passwordEncriptada = Crypto.encrypt(passwordEnTextoClaro, u.getUserName());
+
+        u.setPassword(passwordEncriptada);
+        p.setUsuario(u);
+        ps.save(p);
+
+        emailService.SendEmail(u.getUserEmail(), "Bienvenido a la Billetera Virtual ADA!!!",
+                "Hola " + p.getNombre()
+                        + "\nBienvenido a este hermoso proyecto hecho por todas las alumnas de ADA Backend 8va Mañana\n"
+                        + "Creaste un usuario Admin exitosamente.");
 
         return u;
     }

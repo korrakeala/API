@@ -34,48 +34,69 @@ public class BilleteraController {
     UsuarioService us;
 
     @Autowired
-    EmailService emailService;
+    EmailService es;
+
+    @Autowired
+    PersonaService ps;
 
     @PostMapping("billeteras/{id}/depositos")
-    public MovimientoResponse postAgregarPlata(@PathVariable int id, @RequestBody MovimientoRequest req)
-            throws CuentaPorMonedaException {
+    public MovimientoResponse postAgregarPlata(Principal principal, @PathVariable int id,
+            @RequestBody MovimientoRequest req) throws CuentaPorMonedaException, UsuarioNoAutorizadoException {
         MovimientoResponse r = new MovimientoResponse();
+        Persona p = ps.buscarPorNombre(principal.getName());
+        Billetera b = bs.buscarPorId(id);
 
-        Movimiento m = ms.depositarExtraer(id, req.moneda, req.concepto, req.importe, "Entrada");
-       
-        r.isOk = true;
-        r.message = "Transacción exitosa.";
-        r.billeteraId = id;
-        r.moneda = req.moneda;
-        r.movimientoId = m.getMovimientoId();
-        r.saldo = m.getCuenta().getSaldo();
-        return r;
+        if (b.getPersona().getUsuario().getUserName().equals(principal.getName())
+                || p.getUsuario().getTipoUsuario().equals("Admin")) {
+            Movimiento m = ms.depositarExtraer(id, req.moneda, req.concepto, req.importe, "Entrada");
+
+            r.isOk = true;
+            r.message = "Transacción exitosa.";
+            r.billeteraId = id;
+            r.moneda = req.moneda;
+            r.movimientoId = m.getMovimientoId();
+            r.saldo = m.getCuenta().getSaldo();
+            return r;
+        } else {
+            throw new UsuarioNoAutorizadoException("El usuario no posee permisos para operar con esa billetera.");
+        }
 
     }
 
     @PostMapping("billeteras/{id}/extracciones")
-    public MovimientoResponse postExtraerPlata(@PathVariable int id, @RequestBody MovimientoRequest req)
-            throws CuentaPorMonedaException {
+    public MovimientoResponse postExtraerPlata(Principal principal, @PathVariable int id,
+            @RequestBody MovimientoRequest req) throws CuentaPorMonedaException, UsuarioNoAutorizadoException {
         MovimientoResponse r = new MovimientoResponse();
         // req.importe en negativo para respetar lógica de entradas positivas y salidas
         // negativas
-        Movimiento m = ms.depositarExtraer(id, req.moneda, req.concepto, req.importe.negate(), "Salida");
+        Persona p = ps.buscarPorNombre(principal.getName());
+        Billetera b = bs.buscarPorId(id);
 
-        r.isOk = true;
-        r.message = "Transacción exitosa.";
-        r.billeteraId = id;
-        r.moneda = req.moneda;
-        r.movimientoId = m.getMovimientoId();
-        r.saldo = m.getCuenta().getSaldo();
-        return r;
+        if (b.getPersona().getUsuario().getUserName().equals(principal.getName())
+                || p.getUsuario().getTipoUsuario().equals("Admin")) {
+            Movimiento m = ms.depositarExtraer(id, req.moneda, req.concepto, req.importe.negate(), "Salida");
+
+            r.isOk = true;
+            r.message = "Transacción exitosa.";
+            r.billeteraId = id;
+            r.moneda = req.moneda;
+            r.movimientoId = m.getMovimientoId();
+            r.saldo = m.getCuenta().getSaldo();
+            return r;
+        } else {
+            throw new UsuarioNoAutorizadoException("El usuario no posee permisos para operar con esa billetera.");
+        }
 
     }
 
     @GetMapping("/billeteras/{id}/saldos")
-    public ArrayList<SaldoResponse> getSaldos(Authentication authentication, Principal principal,
-            @PathVariable int id) throws UsuarioNoAutorizadoException {
+    public ArrayList<SaldoResponse> getSaldos(Principal principal, @PathVariable int id)
+            throws UsuarioNoAutorizadoException {
+        Persona p = ps.buscarPorNombre(principal.getName());
         Billetera b = bs.buscarPorId(id);
-        if (b.getPersona().getUsuario().getUserName().equals(principal.getName())) {
+
+        if (b.getPersona().getUsuario().getUserName().equals(principal.getName())
+                || p.getUsuario().getTipoUsuario().equals("Admin")) {
             ArrayList<SaldoResponse> ls = new ArrayList<>();
             for (Cuenta c : b.getCuentas()) {
                 SaldoResponse r = new SaldoResponse();
@@ -90,51 +111,73 @@ public class BilleteraController {
     }
 
     @GetMapping("billeteras/{id}/saldos/{moneda}")
-    public SaldoResponse getConsultarSaldo(@PathVariable int id, @PathVariable String moneda)
-            throws CuentaPorMonedaException {
+    public SaldoResponse getConsultarSaldo(Principal principal, @PathVariable int id, @PathVariable String moneda)
+            throws CuentaPorMonedaException, UsuarioNoAutorizadoException {
         SaldoResponse r = new SaldoResponse();
 
-        BigDecimal saldo = bs.consultarSaldo(id, moneda);
+        Persona p = ps.buscarPorNombre(principal.getName());
+        Billetera b = bs.buscarPorId(id);
 
-        r.billeteraId = id;
-        r.moneda = moneda;
-        r.saldo = saldo;
-        return r;
+        if (b.getPersona().getUsuario().getUserName().equals(principal.getName())
+                || p.getUsuario().getTipoUsuario().equals("Admin")) {
+            BigDecimal saldo = bs.consultarSaldo(id, moneda);
+
+            r.billeteraId = id;
+            r.moneda = moneda;
+            r.saldo = saldo;
+            return r;
+        } else {
+            throw new UsuarioNoAutorizadoException("El usuario no posee permisos para consultar esa billetera.");
+        }
+
     }
 
     @PostMapping("billeteras/{id}/transferencias")
-    public TransferenciaResponse postTransferencia(@PathVariable int id, @RequestBody TransferenciaRequest req)
-            throws CuentaPorMonedaException {
+    public TransferenciaResponse postTransferencia(Principal principal, @PathVariable int id,
+            @RequestBody TransferenciaRequest req) throws CuentaPorMonedaException, UsuarioNoAutorizadoException {
         TransferenciaResponse r = new TransferenciaResponse();
 
-        int operacionId = bs.transferir(id, req.emailUsuarioDest, req.importe, req.concepto);
+        Persona p = ps.buscarPorNombre(principal.getName());
+        Billetera b = bs.buscarPorId(id);
 
-        Usuario uDest = us.buscarPorEmail(req.emailUsuarioDest);
+        if (b.getPersona().getUsuario().getUserName().equals(principal.getName())
+                || p.getUsuario().getTipoUsuario().equals("Admin")) {
+            int operacionId = bs.transferir(id, req.emailUsuarioDest, req.importe, req.concepto);
+            Usuario uDest = us.buscarPorEmail(req.emailUsuarioDest);
 
-        r.isOk = true;
-        r.billeteraIdOrig = id;
-        r.billeteraIdDest = uDest.getPersona().getBilletera().getBilleteraId();
-        r.importe = req.importe;
-        r.concepto = req.concepto;
-        r.operacionId = operacionId;
-        return r; // cómo devolver los ids de movimientos? conviene?
+            r.isOk = true;
+            r.billeteraIdOrig = id;
+            r.billeteraIdDest = uDest.getPersona().getBilletera().getBilleteraId();
+            r.importe = req.importe;
+            r.concepto = req.concepto;
+            r.operacionId = operacionId;
+            return r;
+        } else {
+            throw new UsuarioNoAutorizadoException("El usuario no posee permisos para operar con esa billetera.");
+        }
+
+        // cómo devolver los ids de movimientos? conviene?
     }
 
     @PostMapping("billeteras/{id}/cuentas/{moneda}")
-    public CrearCuentaResponse postCuenta(@PathVariable int id, @PathVariable String moneda)
-            throws CuentaPorMonedaException {
+    public CrearCuentaResponse postCuenta(Principal principal, @PathVariable int id, @PathVariable String moneda)
+            throws UsuarioNoAutorizadoException {
         CrearCuentaResponse r = new CrearCuentaResponse();
 
+        Persona p = ps.buscarPorNombre(principal.getName());
         Billetera b = bs.buscarPorId(id);
-        Cuenta c = new Cuenta(b, moneda);
-        bs.save(b);
-        ms.depositarExtraer(id, moneda, "Carga inicial", (new BigDecimal(50)), "Entrada");
-        bs.save(b);
 
-        r.billeteraId = id;
-        r.message = "Cuenta en " + moneda + " generada con éxito.";
-        r.isOk = true;
-        return r;
+        if (b.getPersona().getUsuario().getUserName().equals(principal.getName())
+                || p.getUsuario().getTipoUsuario().equals("Admin")) {
+            cs.crearCuenta(id, moneda);
+
+            r.billeteraId = id;
+            r.message = "Cuenta en " + moneda + " generada con éxito.";
+            r.isOk = true;
+            return r;
+        } else {
+            throw new UsuarioNoAutorizadoException("El usuario no posee permisos para operar con esa billetera.");
+        }
 
     }
 }
