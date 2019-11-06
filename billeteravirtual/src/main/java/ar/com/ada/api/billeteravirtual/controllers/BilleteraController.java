@@ -41,13 +41,14 @@ public class BilleteraController {
             throws CuentaPorMonedaException {
         MovimientoResponse r = new MovimientoResponse();
 
-        int movimientoId = ms.depositarExtraer(id, req.moneda, req.concepto, req.importe, "Entrada");
+        Movimiento m = ms.depositarExtraer(id, req.moneda, req.concepto, req.importe, "Entrada");
        
         r.isOk = true;
         r.message = "Transacción exitosa.";
         r.billeteraId = id;
         r.moneda = req.moneda;
-        r.movimientoId = movimientoId;
+        r.movimientoId = m.getMovimientoId();
+        r.saldo = m.getCuenta().getSaldo();
         return r;
 
     }
@@ -58,13 +59,14 @@ public class BilleteraController {
         MovimientoResponse r = new MovimientoResponse();
         // req.importe en negativo para respetar lógica de entradas positivas y salidas
         // negativas
-        int movimientoId = ms.depositarExtraer(id, req.moneda, req.concepto, req.importe.negate(), "Salida");
+        Movimiento m = ms.depositarExtraer(id, req.moneda, req.concepto, req.importe.negate(), "Salida");
 
         r.isOk = true;
         r.message = "Transacción exitosa.";
         r.billeteraId = id;
         r.moneda = req.moneda;
-        r.movimientoId = movimientoId;
+        r.movimientoId = m.getMovimientoId();
+        r.saldo = m.getCuenta().getSaldo();
         return r;
 
     }

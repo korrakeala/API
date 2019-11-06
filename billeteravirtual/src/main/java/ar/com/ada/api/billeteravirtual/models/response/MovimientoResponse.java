@@ -1,5 +1,7 @@
 package ar.com.ada.api.billeteravirtual.models.response;
 
+import java.math.BigDecimal;
+
 /**
  * MovimientoResponse
  */
@@ -10,5 +12,6 @@ public class MovimientoResponse {
     public int billeteraId;
     public String moneda;
     public int movimientoId;
+    public BigDecimal saldo;
     
 }

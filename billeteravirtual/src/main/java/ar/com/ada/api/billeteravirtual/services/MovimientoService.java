@@ -45,7 +45,7 @@ public class MovimientoService {
      * @param tipo     "Entrada" o "Salida"
      * @throws CuentaPorMonedaException
      */
-    public int depositarExtraer(int billeteraId, String moneda, String concepto, BigDecimal importe, String tipo)
+    public Movimiento depositarExtraer(int billeteraId, String moneda, String concepto, BigDecimal importe, String tipo)
             throws CuentaPorMonedaException {
         Billetera b = bs.buscarPorId(billeteraId);
         Cuenta c = cs.getCuentaPorMoneda(billeteraId, moneda);
@@ -79,7 +79,7 @@ public class MovimientoService {
                             + ". Si no fuiste vos, ponete en contacto con nosotos a la brevedad.\n" + "Saludos!");
         }
 
-        return m.getMovimientoId();
+        return m;
     }
 
     /**
