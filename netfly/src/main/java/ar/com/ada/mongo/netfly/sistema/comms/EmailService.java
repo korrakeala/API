@@ -1,4 +1,4 @@
-package ar.com.ada.api.billeteravirtual.sistema.comms;
+package ar.com.ada.mongo.netfly.sistema.comms;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
