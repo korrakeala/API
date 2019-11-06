@@ -43,11 +43,11 @@ public class BilleteraController {
     public MovimientoResponse postAgregarPlata(Principal principal, @PathVariable int id,
             @RequestBody MovimientoRequest req) throws CuentaPorMonedaException, UsuarioNoAutorizadoException {
         MovimientoResponse r = new MovimientoResponse();
-        Persona p = ps.buscarPorNombre(principal.getName());
+        Usuario u = us.buscarPorUserName(principal.getName());
         Billetera b = bs.buscarPorId(id);
 
         if (b.getPersona().getUsuario().getUserName().equals(principal.getName())
-                || p.getUsuario().getTipoUsuario().equals("Admin")) {
+                || u.getTipoUsuario().equals("Admin")) {
             Movimiento m = ms.depositarExtraer(id, req.moneda, req.concepto, req.importe, "Entrada");
 
             r.isOk = true;
@@ -69,11 +69,11 @@ public class BilleteraController {
         MovimientoResponse r = new MovimientoResponse();
         // req.importe en negativo para respetar lógica de entradas positivas y salidas
         // negativas
-        Persona p = ps.buscarPorNombre(principal.getName());
+        Usuario u = us.buscarPorUserName(principal.getName());
         Billetera b = bs.buscarPorId(id);
 
         if (b.getPersona().getUsuario().getUserName().equals(principal.getName())
-                || p.getUsuario().getTipoUsuario().equals("Admin")) {
+                || u.getTipoUsuario().equals("Admin")) {
             Movimiento m = ms.depositarExtraer(id, req.moneda, req.concepto, req.importe.negate(), "Salida");
 
             r.isOk = true;
@@ -92,11 +92,11 @@ public class BilleteraController {
     @GetMapping("/billeteras/{id}/saldos")
     public ArrayList<SaldoResponse> getSaldos(Principal principal, @PathVariable int id)
             throws UsuarioNoAutorizadoException {
-        Persona p = ps.buscarPorNombre(principal.getName());
+        Usuario u = us.buscarPorUserName(principal.getName());
         Billetera b = bs.buscarPorId(id);
 
         if (b.getPersona().getUsuario().getUserName().equals(principal.getName())
-                || p.getUsuario().getTipoUsuario().equals("Admin")) {
+                || u.getTipoUsuario().equals("Admin")) {
             ArrayList<SaldoResponse> ls = new ArrayList<>();
             for (Cuenta c : b.getCuentas()) {
                 SaldoResponse r = new SaldoResponse();
@@ -115,11 +115,11 @@ public class BilleteraController {
             throws CuentaPorMonedaException, UsuarioNoAutorizadoException {
         SaldoResponse r = new SaldoResponse();
 
-        Persona p = ps.buscarPorNombre(principal.getName());
+        Usuario u = us.buscarPorUserName(principal.getName());
         Billetera b = bs.buscarPorId(id);
 
         if (b.getPersona().getUsuario().getUserName().equals(principal.getName())
-                || p.getUsuario().getTipoUsuario().equals("Admin")) {
+                || u.getTipoUsuario().equals("Admin")) {
             BigDecimal saldo = bs.consultarSaldo(id, moneda);
 
             r.billeteraId = id;
@@ -137,11 +137,11 @@ public class BilleteraController {
             @RequestBody TransferenciaRequest req) throws CuentaPorMonedaException, UsuarioNoAutorizadoException {
         TransferenciaResponse r = new TransferenciaResponse();
 
-        Persona p = ps.buscarPorNombre(principal.getName());
+        Usuario u = us.buscarPorUserName(principal.getName());
         Billetera b = bs.buscarPorId(id);
 
         if (b.getPersona().getUsuario().getUserName().equals(principal.getName())
-                || p.getUsuario().getTipoUsuario().equals("Admin")) {
+                || u.getTipoUsuario().equals("Admin")) {
             int operacionId = bs.transferir(id, req.emailUsuarioDest, req.importe, req.concepto);
             Usuario uDest = us.buscarPorEmail(req.emailUsuarioDest);
 
@@ -164,11 +164,11 @@ public class BilleteraController {
             throws UsuarioNoAutorizadoException {
         CrearCuentaResponse r = new CrearCuentaResponse();
 
-        Persona p = ps.buscarPorNombre(principal.getName());
+        Usuario u = us.buscarPorUserName(principal.getName());
         Billetera b = bs.buscarPorId(id);
 
         if (b.getPersona().getUsuario().getUserName().equals(principal.getName())
-                || p.getUsuario().getTipoUsuario().equals("Admin")) {
+                || u.getTipoUsuario().equals("Admin")) {
             cs.crearCuenta(id, moneda);
 
             r.billeteraId = id;
@@ -179,5 +179,16 @@ public class BilleteraController {
             throw new UsuarioNoAutorizadoException("El usuario no posee permisos para operar con esa billetera.");
         }
 
+    }
+
+    @GetMapping("billeteras/")
+    public List<Billetera> getBilleteras(Principal principal) throws UsuarioNoAutorizadoException {
+        Usuario u = us.buscarPorUserName(principal.getName());
+
+        if (u.getTipoUsuario().equals("Admin")) {
+            List<Billetera> lb = bs.getBilleteras();
+            return lb;
+        }
+        throw new UsuarioNoAutorizadoException("El usuario no posee autorización para realizar esta acción.");
     }
 }

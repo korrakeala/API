@@ -25,9 +25,9 @@ public class UsuarioController {
 
     @GetMapping("/usuarios")
     public List<Usuario> getUsuarios(Principal principal) throws UsuarioNoAutorizadoException {
-        Persona p = ps.buscarPorNombre(principal.getName());
+        Usuario u = us.buscarPorUserName(principal.getName());
 
-        if (p.getUsuario().getTipoUsuario().equals("Admin")) {
+        if (u.getTipoUsuario().equals("Admin")) {
             List<Usuario> lu = us.getUsuarios();
 
             return lu;
@@ -37,11 +37,12 @@ public class UsuarioController {
 
     @GetMapping("/usuarios/{id}")
     public Usuario getUsuarioById(@PathVariable int id, Principal principal) throws UsuarioNoAutorizadoException {
-        Persona p = ps.buscarPorNombre(principal.getName());
-        if (p.getUsuario().getTipoUsuario().equals("Admin")) {
-            Usuario u = us.buscarPorId(id);
+        Usuario u = us.buscarPorUserName(principal.getName());
 
-            return u;
+        if (u.getTipoUsuario().equals("Admin")) {
+            Usuario usu = us.buscarPorId(id);
+
+            return usu;
         }
         throw new UsuarioNoAutorizadoException("El usuario no posee autorización para realizar esta acción.");
     }

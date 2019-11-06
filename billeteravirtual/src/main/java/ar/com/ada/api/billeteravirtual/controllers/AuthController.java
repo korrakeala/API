@@ -49,7 +49,7 @@ public class AuthController {
         return r;
     }
 
-    @PostMapping("auth/register/admin")
+    @PostMapping("auth/registeradmin")
     public RegistrationResponse postRegisterAdmin(@RequestBody RegistrationRequest req)
             throws PersonaEdadException, CuentaPorMonedaException {
         RegistrationResponse r = new RegistrationResponse();

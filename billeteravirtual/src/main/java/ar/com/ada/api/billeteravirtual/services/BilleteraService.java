@@ -38,6 +38,11 @@ public class BilleteraService {
         repo.save(b);
     }
 
+    public List<Billetera> getBilleteras() {
+
+        return repo.findAll();
+    }
+
     public Billetera buscarPorId(int id) {
 
         Optional<Billetera> b = repo.findById(id);
