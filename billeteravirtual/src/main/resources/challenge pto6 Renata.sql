@@ -1,0 +1,1 @@
+SELECT * FROM movimiento WHERE de_cuenta_id = a_cuenta_id AND tipo_operacion = 'EGRESO';
